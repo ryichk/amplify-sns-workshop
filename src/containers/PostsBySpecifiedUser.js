@@ -9,22 +9,7 @@ import { onCreatePost } from '../graphql/subscriptions';
 import PostList from '../components/PostList';
 import Sidebar from './Sidebar';
 
-const SUBSCRIPTION = 'SUBSCRIPTION';
-const INITIAL_QUERY = 'INITIAL_QUERY';
-const ADDITIONAL_QUERY = 'ADDITIONAL_QUERY';
-
-const reducer = (state, action) => {
-  switch (action.type) {
-    case INITIAL_QUERY:
-      return action.posts;
-    case ADDITIONAL_QUERY:
-      return [...state, ...action.posts];
-    case SUBSCRIPTION:
-      return [action.post, ...state];
-    default:
-      return state;
-  }
-};
+import { reducer } from '../lib/reducer';
 
 export default function PostsBySpecifiedUser() {
   const { userId } = useParams();
@@ -48,17 +33,17 @@ export default function PostsBySpecifiedUser() {
 
   const getAdditionalPosts = () => {
     if (nextToken === null) return;
-    getPosts(ADDITIONAL_QUERY, nextToken);
+    getPosts('ADDITIONAL_QUERY', nextToken);
   }
 
   useEffect(() => {
-    getPosts(INITIAL_QUERY);
+    getPosts('INITIAL_QUERY');
 
     const subscription = API.graphql(graphqlOperation(onCreatePost)).subscribe({
       next: (message) => {
         const post = message.value.data.onCreatePost;
         if (post.owner !== userId) return;
-        dispatch({ type: SUBSCRIPTION, post: post });
+        dispatch({ type: 'SUBSCRIPTION', post: post });
       }
     });
     return () => subscription.unsubscribe();
