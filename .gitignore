@@ -23,7 +23,7 @@ yarn-debug.log*
 yarn-error.log*
 
 
-../../boyaki/amplify/mock-data
+../../amplify/mock-data
 
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Amplify from 'aws-amplify';
 import { AmplifyAuthenticator, AmplifySignUp } from '@aws-amplify/ui-react';
 import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components';
@@ -21,7 +21,7 @@ Amplify.configure(awsconfig);
 
 const drawerWidth = 240;
 
-const theme = createMuiTheme({
+const theme = (createMuiTheme as any)({
   palette: {
     type: 'dark',
     primary: {
@@ -76,12 +76,12 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const App = () => {
-  const [authState, setAuthState] = React.useState();
-  const [user, setUser] = React.useState();
+  const [authState, setAuthState] = useState<AuthState>();
+  const [user, setUser] = useState<object>();
 
   const classes = useStyles();
 
-  React.useEffect(() => {
+  useEffect(() => {
     return onAuthUIStateChange((nextAuthState, authData) => {
       setAuthState(nextAuthState);
       setUser(authData);

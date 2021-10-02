@@ -3,22 +3,25 @@ import React, { useState, useEffect, useReducer } from 'react';
 import { API, graphqlOperation } from 'aws-amplify';
 import { useParams } from 'react-router';
 
+import { Observable } from 'zen-observable-ts';
+
 import { listPostsBySpecificOwner } from '../graphql/queries';
 import { onCreatePost } from '../graphql/subscriptions';
 
-import PostList from '../components/PostList';
+import { PostList } from '../components/PostList';
 import Sidebar from './Sidebar';
 
 import { reducer } from '../lib/reducer';
+import { ActionType } from '../interfaces';
 
-export default function PostsBySpecifiedUser() {
-  const { userId } = useParams();
+const PostsBySpecifiedUser: React.FC = () => {
+  const { userId } = useParams<{ userId: string}>();
 
   const [posts, dispatch] = useReducer(reducer, []);
   const [nextToken, setNextToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getPosts = async (type, nextToken = null) => {
+  const getPosts = async (type: ActionType, nextToken = null) => {
     const response = await API.graphql(graphqlOperation(listPostsBySpecificOwner, {
       owner: userId,
       sortDirection: 'DESC',
@@ -33,17 +36,17 @@ export default function PostsBySpecifiedUser() {
 
   const getAdditionalPosts = () => {
     if (nextToken === null) return;
-    getPosts('ADDITIONAL_QUERY', nextToken);
+    getPosts(ActionType.ADDITIONAL_QUERY, nextToken);
   }
 
   useEffect(() => {
-    getPosts('INITIAL_QUERY');
+    getPosts(ActionType.INITIAL_QUERY);
 
-    const subscription = API.graphql(graphqlOperation(onCreatePost)).subscribe({
+    const subscription = (API.graphql(graphqlOperation(onCreatePost)) as Observable<any>).subscribe({
       next: (message) => {
         const post = message.value.data.onCreatePost;
         if (post.owner !== userId) return;
-        dispatch({ type: 'SUBSCRIPTION', post: post });
+        dispatch({ type: ActionType.SUBSCRIPTION, post: post });
       }
     });
     return () => subscription.unsubscribe();
@@ -63,3 +66,5 @@ export default function PostsBySpecifiedUser() {
     </>
   )
 }
+
+export default PostsBySpecifiedUser;

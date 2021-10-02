@@ -1,27 +1,32 @@
 import React, { useState, useEffect, useReducer } from 'react';
 
 import { API, graphqlOperation } from 'aws-amplify';
+import { GraphQLResult } from '@aws-amplify/api';
+
+import { Observable } from 'zen-observable-ts';
 
 import { listPostsSortedByTimestamp } from '../graphql/queries';
 import { onCreatePost } from '../graphql/subscriptions';
 
-import PostList from '../components/PostList';
+import { PostList } from '../components/PostList';
 import Sidebar from './Sidebar';
 
 import { reducer } from '../lib/reducer';
+import { Post, ActionType } from '../interfaces';
 
-export default function AllPosts() {
+const AllPosts: React.FC = () => {
   const [posts, dispatch] = useReducer(reducer, []);
   const [nextToken, setNextToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getPosts = async (type, nextToken = null) => {
-    const response = await API.graphql(graphqlOperation(listPostsSortedByTimestamp, {
+  const getPosts = async (type: ActionType, nextToken = null) => {
+    const response = (
+      await API.graphql(graphqlOperation(listPostsSortedByTimestamp, {
       type: 'post',
       sortDirection: 'DESC',
       limit: 20,
       nextToken: nextToken,
-    }));
+    }))) as GraphQLResult<any>;
     console.log(response);
     dispatch({
       type: type,
@@ -33,19 +38,19 @@ export default function AllPosts() {
 
   const getAdditionalPosts = () => {
     if (nextToken === null) return;
-    getPosts('ADDITIONAL_QUERY', nextToken);
+    getPosts(ActionType.ADDITIONAL_QUERY, nextToken);
   }
 
   useEffect(() => {
-    getPosts('INITIAL_QUERY');
+    getPosts(ActionType.INITIAL_QUERY);
 
-    const subscription = API.graphql(graphqlOperation(onCreatePost)).subscribe({
+    const subscription = (API.graphql(graphqlOperation(onCreatePost)) as Observable<any>).subscribe({
       next: (message) => {
         console.log('allposts subscription fired');
-        const post = message.value.data.onCreatePost;
+        const post = message.value.data.onCreatePost as Post;
         dispatch({
-          post: post,
-          type: 'SUBSCRIPTION'
+          type: ActionType.SUBSCRIPTION,
+          post: post
         });
       }
     });
@@ -61,8 +66,10 @@ export default function AllPosts() {
         isLoading={isLoading}
         posts={posts}
         getAdditionalPosts={getAdditionalPosts}
-        listHelperTitle={'Global Timeline'}
+        listHeaderTitle={'Global Timeline'}
       />
     </>
   )
 }
+
+export default AllPosts;
