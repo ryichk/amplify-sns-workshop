@@ -42,7 +42,11 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function Sidebar({ activeListItem }) {
+interface SidebarProps {
+  activeListItem: string;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ activeListItem }) => {
   const classes = useStyles();
   const history = useHistory();
 
@@ -50,11 +54,11 @@ export default function Sidebar({ activeListItem }) {
   const [isError, setIsError] = useState(false);
   const [helperText, setHelperText] = useState('');
 
-  const handleChange = event => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
     if (event.target.value.length > MAX_POST_CONTENT_LENGTH) {
       setIsError(true);
-      setHelperText(MAX_POST_CONTENT_LENGTH - event.target.value.length);
+      setHelperText(`${MAX_POST_CONTENT_LENGTH - event.target.value.length}`);
     } else {
       setIsError(false);
       setHelperText('');
@@ -131,7 +135,7 @@ export default function Sidebar({ activeListItem }) {
               variant='filled'
               value={value}
               onChange={handleChange}
-              fullwidth
+              fullWidth
               margin='normal'
             />
           } />
@@ -164,3 +168,5 @@ export default function Sidebar({ activeListItem }) {
     </Drawer>
   )
 }
+
+export default Sidebar;

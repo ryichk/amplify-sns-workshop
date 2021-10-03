@@ -16,6 +16,8 @@ import {
 import { useHistory } from 'react-router';
 import moment from 'moment';
 
+import { Diff, Post, PostItemProps, PostListProps } from '../interfaces';
+
 const useStyles = makeStyles(theme => ({
   listRoot: {
     width: '100%',
@@ -42,10 +44,59 @@ const useStyles = makeStyles(theme => ({
   },
   clickable: {
     cursor: 'pointer',
-  }
+  },
 }));
 
-export default function PostList({ isLoading, posts, getAdditionalPosts, listHeaderTitle, listHeaderTitleButton }) {
+const PostItem: React.FC<PostItemProps> = ({ post }) => {
+  const classes = useStyles();
+  const history = useHistory();
+  const now = moment();
+  console.log(now);
+
+  const calcTimestampDiff = (timestamp: number) => {
+    const scales: Array<Diff> = ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'];
+
+    for (let i=0; i < scales.length; i++) {
+      const scale: Diff = scales[i];
+      const diff = moment(now).diff(timestamp *1000, scale);
+      if (diff > 0) return diff + scale.charAt(0);
+    }
+
+    return 0 + scales[scales.length - 1].charAt(0);
+  }
+
+  return (
+    <ListItem alignItems='flex-start' key={post?.id}>
+      <ListItemAvatar>
+        <div className={classes.clickable} onClick={() => history.push(`/${post?.owner}`)}>
+          <Avatar alt={post?.owner} src='/' />
+        </div>
+      </ListItemAvatar>
+      <ListItemText
+        primary={
+          <>
+            {post?.owner}
+            <Typography
+              color='textSecondary'
+              display='inline'
+            >
+              {` ${String.fromCharCode(183)} ${calcTimestampDiff(post?.timestamp ? post.timestamp : 0)}`}
+            </Typography>
+          </>
+        }
+        secondary={
+          <Typography
+            color='textPrimary'
+          >
+            {post?.content}
+          </Typography>
+        }
+      />
+    </ListItem>
+  )
+}
+
+export const PostList: React.FC<PostListProps> = ({ isLoading, posts, getAdditionalPosts, listHeaderTitle }) => {
   const classes = useStyles();
   return (
     <div className={classes.listRoot}>
@@ -61,14 +112,11 @@ export default function PostList({ isLoading, posts, getAdditionalPosts, listHea
           >
             <Typography
               variant='h5'
-              fontWeight='fontWeightBold'
-              maxWidth
             >
               {listHeaderTitle}
-              {listHeaderTitleButton && listHeaderTitleButton}
             </Typography>
           </ListItem>
-          {posts.map(post => {
+          {posts?.map((post: Post | undefined) => {
             return (
               <span>
                 <PostItem post={post} />
@@ -96,54 +144,5 @@ export default function PostList({ isLoading, posts, getAdditionalPosts, listHea
         </List>
       }
     </div>
-  )
-}
-
-function PostItem({ post }) {
-  const classes = useStyles();
-  const history = useHistory();
-  const now = moment();
-  console.log(now);
-
-  const calcTimestampDiff = (timestamp) => {
-    const scales = ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'];
-
-    for (let i=0; i < scales.length; i++) {
-      const scale = scales[i];
-      const diff = moment(now).diff(timestamp *1000, scale);
-      if (diff > 0) return diff + scale.charAt(0);
-    }
-
-    return 0 + scales[scales.length - 1].charAt(0);
-  }
-
-  return (
-    <ListItem alignItems='flex-start' key={post.id}>
-      <ListItemAvatar>
-        <div className={classes.clickable} onClick={() => history.push(`/${post.owner}`)}>
-          <Avatar alt={post.owner} src='/' />
-        </div>
-      </ListItemAvatar>
-      <ListItemText
-        primary={
-          <>
-            {post.owner}
-            <Typography
-              color='textSecondary'
-              display='inline'
-            >
-              {` ${String.fromCharCode(183)} ${calcTimestampDiff(post.timestamp)}`}
-            </Typography>
-          </>
-        }
-        secondary={
-          <Typography
-            color='textPrimary'
-          >
-            {post.content}
-          </Typography>
-        }
-      />
-    </ListItem>
   )
 }
