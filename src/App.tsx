@@ -1,29 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import Amplify from 'aws-amplify';
 import { AmplifyAuthenticator, AmplifySignUp } from '@aws-amplify/ui-react';
-import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components';
-import awsconfig from './aws-exports';
+import { AuthState, CognitoUserInterface, onAuthUIStateChange } from '@aws-amplify/ui-components';
 
-import {
-  HashRouter,
-  Switch,
-  Route,
-  Redirect,
-} from 'react-router-dom';
+import { HashRouter, Switch, Route, Redirect } from 'react-router-dom';
 
-import { makeStyles, createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import { createTheme, ThemeProvider, Theme, StyledEngineProvider } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import CssBaseline from '@mui/material/CssBaseline';
+import awsconfig from './aws-exports.js';
 
 import AllPosts from './containers/AllPosts';
 import PostsBySpecifiedUser from './containers/PostsBySpecifiedUser';
+
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
 
 Amplify.configure(awsconfig);
 
 const drawerWidth = 240;
 
-const theme = (createMuiTheme as any)({
+// eslint-disable-next-line
+const theme = (createTheme as any)({
   palette: {
-    type: 'dark',
+    mode: 'dark',
     primary: {
       main: '#1EA1F2',
       contrastText: '#fff',
@@ -40,16 +42,14 @@ const theme = (createMuiTheme as any)({
     },
   },
   typography: {
-    fontFamily: [
-      'Arial',
-    ].join(','),
+    fontFamily: ['Arial'].join(','),
   },
   status: {
     danger: 'orange',
-  }
+  },
 });
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((_theme) => ({
   root: {
     display: 'flex',
     height: '100%',
@@ -67,53 +67,56 @@ const useStyles = makeStyles(theme => ({
   drawerPaper: {
     width: drawerWidth,
   },
-  toolbar: theme.mixins.toolbar,
+  toolbar: _theme.mixins.toolbar,
   content: {
     flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(3),
+    backgroundColor: _theme.palette.background.default,
+    padding: _theme.spacing(3),
   },
 }));
 
-const App = () => {
-  const [authState, setAuthState] = useState<AuthState>();
-  const [user, setUser] = useState<object>();
-
+function Component() {
   const classes = useStyles();
+  return (
+    <div className={classes.root}>
+      <CssBaseline />
+      <HashRouter>
+        <Switch>
+          <Route exact path="/" component={AllPosts} />
+          <Route exact path="/global-timeline" component={AllPosts} />
+          <Route exact path="/:userId" component={PostsBySpecifiedUser} />
+          <Redirect path="*" to="/" />
+        </Switch>
+      </HashRouter>
+    </div>
+  );
+}
+
+const App: React.FC = () => {
+  const [authState, setAuthState] = useState<AuthState>();
+  const [user, setUser] = useState<CognitoUserInterface>();
 
   useEffect(() => {
     return onAuthUIStateChange((nextAuthState, authData) => {
       setAuthState(nextAuthState);
-      setUser(authData);
+      setUser(authData as CognitoUserInterface);
     });
   }, []);
 
   return authState === AuthState.SignedIn && user ? (
-    <div className={classes.root}>
+    <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <HashRouter>
-          <Switch>
-            <Route exact path='/' component={AllPosts} />
-            <Route exact path='/global-timeline' component={AllPosts} />
-            <Route exact path='/:userId' component={PostsBySpecifiedUser} />
-            <Redirect path='*' to='/' />
-          </Switch>
-        </HashRouter>
+        <Component />
       </ThemeProvider>
-    </div>
+    </StyledEngineProvider>
   ) : (
     <AmplifyAuthenticator>
       <AmplifySignUp
         slot="sign-up"
-        formFields={[
-          { type: "username" },
-          { type: "password" },
-          { type: "email" }
-        ]}
+        formFields={[{ type: 'username' }, { type: 'password' }, { type: 'email' }]}
       />
     </AmplifyAuthenticator>
   );
-}
+};
 
 export default App;

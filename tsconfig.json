@@ -7,10 +7,7 @@
     "experimentalDecorators": true,
     "target": "es5",
     "jsx": "react-jsx",
-    "lib": [
-      "dom",
-      "es6"
-    ],
+    "lib": ["dom", "es6"],
     "allowJs": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
@@ -23,8 +20,6 @@
     "noImplicitAny": true,
     "noImplicitThis": true
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src"],
   "compileOnSave": false
 }
