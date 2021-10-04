@@ -1,13 +1,18 @@
 export type Diff = 'years' | 'months' | 'weeks' | 'days' | 'hours' | 'minutes' | 'seconds';
 
-export interface Post {
-  id: number;
-  owner: string;
-  timestamp: number;
-  content: string;
-}
+export type Post =
+  | {
+      __typename: 'Post';
+      type: string;
+      id?: string | null | undefined;
+      content: string;
+      owner?: string | null | undefined;
+      timestamp: number;
+    }
+  | null
+  | undefined;
 
-export type Posts = Array<Post | undefined> | null | undefined;
+export type Posts = (Post | null)[] | null | undefined;
 
 export interface PostItemProps {
   post: Post | undefined;
@@ -15,16 +20,17 @@ export interface PostItemProps {
 
 export interface PostListProps {
   isLoading: boolean;
-  posts: Posts
-  getAdditionalPosts: Function;
+  posts: Posts;
+  getAdditionalPosts: () => void;
   listHeaderTitle: string;
 }
 
-export enum ActionType {
-  INITIAL_QUERY = 'INITIAL_QUERY',
-  ADDITIONAL_QUERY = 'ADDITIONAL_QUERY',
-  SUBSCRIPTION = 'SUBSCRIPTION',
-}
+export const ActionType = {
+  INITIAL_QUERY: 'INITIAL_QUERY',
+  ADDITIONAL_QUERY: 'ADDITIONAL_QUERY',
+  SUBSCRIPTION: 'SUBSCRIPTION',
+};
+export type ActionType = typeof ActionType[keyof typeof ActionType];
 
 export type ReducerState = Posts;
 

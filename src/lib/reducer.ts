@@ -1,7 +1,10 @@
 import { Reducer } from 'react';
 import { ActionType, ReducerState, ReducerAction } from '../interfaces';
 
-export const reducer: Reducer<ReducerState, ReducerAction> = (state: ReducerState, action: ReducerAction) => {
+const reducer: Reducer<ReducerState, ReducerAction> = (
+  state: ReducerState,
+  action: ReducerAction
+) => {
   switch (action.type) {
     case ActionType.INITIAL_QUERY:
       return action.posts;
@@ -13,3 +16,5 @@ export const reducer: Reducer<ReducerState, ReducerAction> = (state: ReducerStat
       return state;
   }
 };
+
+export default reducer;

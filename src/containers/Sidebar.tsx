@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { makeStyles } from '@material-ui/core/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import {
   Button,
   List,
@@ -9,21 +9,18 @@ import {
   TextField,
   ListItemIcon,
   Drawer,
-} from '@material-ui/core';
-import {
-  Person as PersonIcon,
-  Public as PublicIcon,
-} from '@material-ui/icons';
+} from '@mui/material';
+import { Person as PersonIcon, Public as PublicIcon } from '@mui/icons-material';
 
 import { Auth, API, graphqlOperation } from 'aws-amplify';
 
-import { createPost } from '../graphql/mutations';
 import { useHistory } from 'react-router';
+import { createPost } from '../graphql/mutations';
 
 const drawerWidth = 340;
 const MAX_POST_CONTENT_LENGTH = 140;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
@@ -66,30 +63,31 @@ const Sidebar: React.FC<SidebarProps> = ({ activeListItem }) => {
   };
 
   const onPost = async () => {
-    const res = await API.graphql(graphqlOperation(createPost, { input: {
-      type: 'post',
-      content: value,
-      timestamp: Math.floor(Date.now() / 1000),
-    }}));
+    await API.graphql(
+      graphqlOperation(createPost, {
+        input: {
+          type: 'post',
+          content: value,
+          timestamp: Math.floor(Date.now() / 1000),
+        },
+      })
+    );
 
-    console.log(res);
     setValue('');
-  }
+  };
 
   const signOut = () => {
-    Auth.signOut()
-      .then(data => console.log(data))
-      .catch(error => console.log(error));
-  }
+    Auth.signOut();
+  };
 
   return (
     <Drawer
       className={classes.drawer}
-      variant='permanent'
+      variant="permanent"
       classes={{
         paper: classes.drawerPaper,
       }}
-      anchor='left'
+      anchor="left"
     >
       <div className={classes.toolbar} />
       <List>
@@ -97,16 +95,16 @@ const Sidebar: React.FC<SidebarProps> = ({ activeListItem }) => {
           button
           selected={activeListItem === 'global-timeline'}
           onClick={() => {
-            Auth.currentAuthenticatedUser().then((user) => {
+            Auth.currentAuthenticatedUser().then(() => {
               history.push('/global-timeline');
-            })
+            });
           }}
-          key='global-timeline'
+          key="global-timeline"
         >
           <ListItemIcon>
             <PublicIcon />
           </ListItemIcon>
-          <ListItemText primary='Global Timeline' />
+          <ListItemText primary="Global Timeline" />
         </ListItem>
         <ListItem
           button
@@ -114,59 +112,61 @@ const Sidebar: React.FC<SidebarProps> = ({ activeListItem }) => {
           onClick={() => {
             Auth.currentAuthenticatedUser().then((user) => {
               history.push(`/${user.username}`);
-            })
+            });
           }}
-          key='profile'
+          key="profile"
         >
           <ListItemIcon>
             <PersonIcon />
           </ListItemIcon>
-          <ListItemText primary='Profile' />
+          <ListItemText primary="Profile" />
         </ListItem>
-        <ListItem key='post-input-field'>
-          <ListItemText primary={
-            <TextField
-              error={isError}
-              helperText={helperText}
-              id='post-input'
-              label='Type your post'
-              multiline
-              rowsMax='8'
-              variant='filled'
-              value={value}
-              onChange={handleChange}
-              fullWidth
-              margin='normal'
-            />
-          } />
+        <ListItem key="post-input-field">
+          <ListItemText
+            primary={
+              <TextField
+                error={isError}
+                helperText={helperText}
+                id="post-input"
+                label="Type your post"
+                multiline
+                maxRows="8"
+                variant="filled"
+                value={value}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+              />
+            }
+          />
         </ListItem>
-        <ListItem key='post-button'>
-          <ListItemText primary={
-            <Button
-              variant='contained'
-              color='primary'
-              disabled={isError}
-              onClick={onPost}
-              fullWidth
-            >
-              Post
-            </Button>
-          } />
+        <ListItem key="post-button">
+          <ListItemText
+            primary={
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={isError}
+                onClick={onPost}
+                fullWidth
+              >
+                Post
+              </Button>
+            }
+          />
         </ListItem>
-        <ListItem key='logout'>
-          <ListItemText primary={
-            <Button
-              variant='outlined'
-              onClick={signOut}
-              fullWidth
-            >
-              Logout
-            </Button>
-          } />
+        <ListItem key="logout">
+          <ListItemText
+            primary={
+              <Button variant="outlined" onClick={signOut} fullWidth>
+                Logout
+              </Button>
+            }
+          />
         </ListItem>
       </List>
     </Drawer>
-  )
-}
+  );
+};
 
 export default Sidebar;
