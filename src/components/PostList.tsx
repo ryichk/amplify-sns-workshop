@@ -97,6 +97,7 @@ const PostList: React.FC<PostListProps> = ({
   posts,
   getAdditionalPosts,
   listHeaderTitle,
+  listHeaderTitleButton,
 }) => {
   const classes = useStyles();
   return (
@@ -109,6 +110,7 @@ const PostList: React.FC<PostListProps> = ({
         <List disablePadding>
           <ListItem alignItems="flex-start" className={classes.listHeader}>
             <Typography variant="h5">{listHeaderTitle}</Typography>
+            {listHeaderTitleButton}
           </ListItem>
           {posts?.map((post: Post) => {
             return (

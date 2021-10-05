@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "api": {
+      "BoyakiGql": [
+        "Query",
+        "Mutation"
+      ]
+    }
+  },
+  "lambdaLayers": []
+}

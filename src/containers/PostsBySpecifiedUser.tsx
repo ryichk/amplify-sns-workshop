@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useReducer } from 'react';
 
-import { API, graphqlOperation } from 'aws-amplify';
+import { Auth, API, graphqlOperation } from 'aws-amplify';
+import { CognitoUserInterface } from '@aws-amplify/ui-components';
 import { useParams } from 'react-router';
 
 import { Observable } from 'zen-observable-ts';
 
-import { listPostsBySpecificOwner } from '../graphql/queries';
+import { Button } from '@mui/material';
+
+import { listPostsBySpecificOwner, getFollowRelationship } from '../graphql/queries';
 import { onCreatePost } from '../graphql/subscriptions';
+import { createFollowRelationship, deleteFollowRelationship } from '../graphql/mutations';
 
 import PostList from '../components/PostList';
 import Sidebar from './Sidebar';
@@ -21,6 +25,8 @@ const PostsBySpecifiedUser: React.FC = () => {
   const [posts, dispatch] = useReducer(reducer, []);
   const [nextToken, setNextToken] = useState<string | null | undefined>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<CognitoUserInterface>();
+  const [isFollowing, setIsFollowing] = useState(false);
 
   const getPosts = async (type: ActionType, _nextToken: string | null | undefined = null) => {
     const response = await API.graphql(
@@ -28,7 +34,7 @@ const PostsBySpecifiedUser: React.FC = () => {
         owner: userId,
         sortDirection: 'DESC',
         limit: 20,
-        _nextToken,
+        nextToken: _nextToken,
       })
     );
     if ('data' in response && response.data) {
@@ -41,13 +47,54 @@ const PostsBySpecifiedUser: React.FC = () => {
     }
   };
 
+  const getIsFollowing = async (followerId: string, followeeId: string) => {
+    const response = await API.graphql(
+      graphqlOperation(getFollowRelationship, {
+        followeeId,
+        followerId,
+      })
+    );
+    return response.data.getFollowRelationship !== null;
+  };
+
   const getAdditionalPosts = () => {
     if (nextToken === null) return;
     getPosts(ActionType.ADDITIONAL_QUERY, nextToken);
   };
 
+  const follow = async () => {
+    const input = {
+      followeeId: userId,
+      followerId: currentUser?.username,
+      timestamp: Math.floor(Date.now() / 1000),
+    };
+    await API.graphql(
+      graphqlOperation(createFollowRelationship, {
+        input,
+      })
+    );
+  };
+
+  const unfollow = async () => {
+    const input = {
+      followeeId: userId,
+      followerId: currentUser?.username,
+    };
+    const response = await API.graphql(graphqlOperation(deleteFollowRelationship, { input }));
+
+    if (!response.data.deleteFollowRelationship.errors) setIsFollowing(false);
+  };
+
   useEffect(() => {
-    getPosts(ActionType.INITIAL_QUERY);
+    const init = async () => {
+      const currentAuthUser = await Auth.currentAuthenticatedUser();
+      setCurrentUser(currentAuthUser);
+
+      setIsFollowing(await getIsFollowing(userId, currentAuthUser.username));
+
+      getPosts(ActionType.INITIAL_QUERY);
+    };
+    init();
 
     let unsubscribe;
     const subscription = API.graphql(graphqlOperation(onCreatePost));
@@ -74,6 +121,19 @@ const PostsBySpecifiedUser: React.FC = () => {
         posts={posts}
         getAdditionalPosts={getAdditionalPosts}
         listHeaderTitle={userId}
+        listHeaderTitleButton={
+          currentUser &&
+          userId !== currentUser.username &&
+          (isFollowing ? (
+            <Button variant="contained" color="primary" onClick={unfollow}>
+              Following
+            </Button>
+          ) : (
+            <Button variant="outlined" color="primary" onClick={follow}>
+              Follow
+            </Button>
+          ))
+        }
       />
     </>
   );

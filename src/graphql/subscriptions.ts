@@ -24,3 +24,39 @@ export const onDeletePost = /* GraphQL */ `
     }
   }
 `;
+export const onCreateTimeline = /* GraphQL */ `
+  subscription OnCreateTimeline($userId: String!) {
+    onCreateTimeline(userId: $userId) {
+      userId
+      timestamp
+      postId
+      post {
+        type
+        id
+        content
+        owner
+        timestamp
+      }
+    }
+  }
+`;
+export const onCreateFollowRelationship = /* GraphQL */ `
+  subscription OnCreateFollowRelationship {
+    onCreateFollowRelationship {
+      followeeId
+      followerId
+      timestamp
+      follwerId
+    }
+  }
+`;
+export const onDeleteFollowRelationship = /* GraphQL */ `
+  subscription OnDeleteFollowRelationship {
+    onDeleteFollowRelationship {
+      followeeId
+      followerId
+      timestamp
+      follwerId
+    }
+  }
+`;

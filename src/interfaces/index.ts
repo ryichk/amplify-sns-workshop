@@ -12,7 +12,25 @@ export type Post =
   | null
   | undefined;
 
-export type Posts = (Post | null)[] | null | undefined;
+export type Posts = Array<Post> | null | undefined;
+
+export type Timeline =
+  | {
+      __typename: 'Timeline';
+      userId: string;
+      timestamp: number;
+      postId: string;
+      post?: Post;
+    }
+  | null
+  | undefined;
+
+export type Timelines = Array<Timeline> | null | undefined;
+export interface ListTimelines {
+  __typename: 'ModelTimelineConnection';
+  items?: Timelines;
+  nextToken?: string | null;
+}
 
 export interface PostItemProps {
   post: Post | undefined;
@@ -23,6 +41,7 @@ export interface PostListProps {
   posts: Posts;
   getAdditionalPosts: () => void;
   listHeaderTitle: string;
+  listHeaderTitleButton?: false | JSX.Element | undefined;
 }
 
 export const ActionType = {

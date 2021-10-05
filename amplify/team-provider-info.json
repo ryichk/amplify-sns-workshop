@@ -1,26 +1,32 @@
 {
-    "production": {
-        "awscloudformation": {
-            "AuthRoleName": "amplify-boyaki-production-92155-authRole",
-            "UnauthRoleArn": "arn:aws:iam::553258776374:role/amplify-boyaki-production-92155-unauthRole",
-            "AuthRoleArn": "arn:aws:iam::553258776374:role/amplify-boyaki-production-92155-authRole",
-            "Region": "ap-northeast-1",
-            "DeploymentBucketName": "amplify-boyaki-production-92155-deployment",
-            "UnauthRoleName": "amplify-boyaki-production-92155-unauthRole",
-            "StackName": "amplify-boyaki-production-92155",
-            "StackId": "arn:aws:cloudformation:ap-northeast-1:553258776374:stack/amplify-boyaki-production-92155/43911ec0-20bb-11ec-83d2-0aaa22787a93",
-            "AmplifyAppId": "d3eu5lmsiwe87e"
-        },
-        "categories": {
-            "auth": {
-                "boyakid58e0200": {}
-            },
-            "hosting": {
-                "amplifyhosting": {
-                    "appId": "d3eu5lmsiwe87e",
-                    "type": "manual"
-                }
-            }
+  "production": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-boyaki-production-92155-authRole",
+      "UnauthRoleArn": "arn:aws:iam::553258776374:role/amplify-boyaki-production-92155-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::553258776374:role/amplify-boyaki-production-92155-authRole",
+      "Region": "ap-northeast-1",
+      "DeploymentBucketName": "amplify-boyaki-production-92155-deployment",
+      "UnauthRoleName": "amplify-boyaki-production-92155-unauthRole",
+      "StackName": "amplify-boyaki-production-92155",
+      "StackId": "arn:aws:cloudformation:ap-northeast-1:553258776374:stack/amplify-boyaki-production-92155/43911ec0-20bb-11ec-83d2-0aaa22787a93",
+      "AmplifyAppId": "d3eu5lmsiwe87e"
+    },
+    "categories": {
+      "auth": {
+        "boyakid58e0200": {}
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d3eu5lmsiwe87e",
+          "type": "manual"
         }
+      },
+      "function": {
+        "createPostAndTimeline": {
+          "deploymentBucketName": "amplify-boyaki-production-92155-deployment",
+          "s3Key": "amplify-builds/createPostAndTimeline-3131366138566e553162-build.zip"
+        }
+      }
     }
+  }
 }
