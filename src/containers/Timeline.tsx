@@ -3,8 +3,6 @@ import React, { useState, useEffect, useReducer } from 'react';
 import { Auth, API, graphqlOperation } from 'aws-amplify';
 import { CognitoUserInterface } from '@aws-amplify/ui-components';
 
-import { Observable } from 'zen-observable-ts';
-
 import { listTimelines } from '../graphql/queries';
 import { onCreateTimeline } from '../graphql/subscriptions';
 
@@ -12,7 +10,7 @@ import PostList from '../components/PostList';
 import Sidebar from './Sidebar';
 
 import reducer from '../lib/reducer';
-import { Post, ListTimelines, ActionType } from '../interfaces';
+import { Post, ListTimelines, ActionType, OnCreateTimelineSubscriptionMsg } from '../interfaces';
 
 const Timeline: React.FC = () => {
   const [posts, dispatch] = useReducer(reducer, []);
@@ -71,10 +69,13 @@ const Timeline: React.FC = () => {
         userId: currentUser.username,
       })
     );
-    if (subscription instanceof Observable) {
+    if ('subscribe' in subscription) {
       const sub = subscription.subscribe({
-        next: ({ value: { data } }) => {
-          dispatch({ type: ActionType.SUBSCRIPTION, post: data.onCreateTimeline.post });
+        next: (msg: OnCreateTimelineSubscriptionMsg) => {
+          const {
+            value: { data },
+          } = msg;
+          dispatch({ type: ActionType.SUBSCRIPTION, post: data.onCreateTimeline?.post });
         },
       });
       unsubscribe = () => {

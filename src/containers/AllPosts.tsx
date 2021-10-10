@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { API, graphqlOperation } from 'aws-amplify';
-import { Observable } from 'zen-observable-ts';
 
 import { listPostsSortedByTimestamp } from '../graphql/queries';
 import { onCreatePost } from '../graphql/subscriptions';
@@ -9,7 +8,7 @@ import PostList from '../components/PostList';
 import Sidebar from './Sidebar';
 
 import reducer from '../lib/reducer';
-import { Post, ActionType } from '../interfaces';
+import { Post, ActionType, OnCreatePostSubscriptionMsg } from '../interfaces';
 import { ListPostsSortedByTimestampQuery } from '../API';
 
 const AllPosts: React.FC = () => {
@@ -23,7 +22,7 @@ const AllPosts: React.FC = () => {
         type: 'post',
         sortDirection: 'DESC',
         limit: 20,
-        _nextToken,
+        nextToken: _nextToken,
       })
     );
     if ('data' in response && response.data) {
@@ -49,9 +48,12 @@ const AllPosts: React.FC = () => {
 
     let unsubscribe;
     const subscription = API.graphql(graphqlOperation(onCreatePost));
-    if (subscription instanceof Observable) {
+    if ('subscribe' in subscription) {
       const sub = subscription.subscribe({
-        next: ({ value: { data } }) => {
+        next: (msg: OnCreatePostSubscriptionMsg) => {
+          const {
+            value: { data },
+          } = msg;
           const post = data.onCreatePost as Post;
           dispatch({
             type: ActionType.SUBSCRIPTION,

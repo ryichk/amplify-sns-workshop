@@ -24,19 +24,6 @@ export const deletePost = /* GraphQL */ `
     }
   }
 `;
-export const createFollowRelationship = /* GraphQL */ `
-  mutation CreateFollowRelationship(
-    $input: CreateFollowRelationshipInput!
-    $condition: ModelFollowRelationshipConditionInput
-  ) {
-    createFollowRelationship(input: $input, condition: $condition) {
-      followeeId
-      followerId
-      timestamp
-      follwerId
-    }
-  }
-`;
 export const deleteFollowRelationship = /* GraphQL */ `
   mutation DeleteFollowRelationship(
     $input: DeleteFollowRelationshipInput!
@@ -46,7 +33,6 @@ export const deleteFollowRelationship = /* GraphQL */ `
       followeeId
       followerId
       timestamp
-      follwerId
     }
   }
 `;
@@ -57,6 +43,18 @@ export const createPost = /* GraphQL */ `
       id
       content
       owner
+      timestamp
+    }
+  }
+`;
+export const createFollowRelationship = /* GraphQL */ `
+  mutation CreateFollowRelationship(
+    $input: CreateFollowRelationshipInput!
+    $condition: ModelFollowRelationshipConditionInput
+  ) {
+    createFollowRelationship(input: $input, condition: $condition) {
+      followeeId
+      followerId
       timestamp
     }
   }

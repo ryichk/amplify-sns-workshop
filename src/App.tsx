@@ -102,7 +102,7 @@ const App: React.FC = () => {
       setAuthState(nextAuthState);
       setUser(authData as CognitoUserInterface);
     });
-  }, []);
+  }, [user]);
 
   return authState === AuthState.SignedIn && user ? (
     <StyledEngineProvider injectFirst>

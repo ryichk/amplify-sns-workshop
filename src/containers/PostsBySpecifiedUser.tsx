@@ -4,8 +4,6 @@ import { Auth, API, graphqlOperation } from 'aws-amplify';
 import { CognitoUserInterface } from '@aws-amplify/ui-components';
 import { useParams } from 'react-router';
 
-import { Observable } from 'zen-observable-ts';
-
 import { Button } from '@mui/material';
 
 import { listPostsBySpecificOwner, getFollowRelationship } from '../graphql/queries';
@@ -16,7 +14,7 @@ import PostList from '../components/PostList';
 import Sidebar from './Sidebar';
 
 import reducer from '../lib/reducer';
-import { ActionType } from '../interfaces';
+import { ActionType, OnCreatePostSubscriptionMsg } from '../interfaces';
 import { ListPostsBySpecificOwnerQuery } from '../API';
 
 const PostsBySpecifiedUser: React.FC = () => {
@@ -98,11 +96,14 @@ const PostsBySpecifiedUser: React.FC = () => {
 
     let unsubscribe;
     const subscription = API.graphql(graphqlOperation(onCreatePost));
-    if (subscription instanceof Observable) {
+    if ('subscribe' in subscription) {
       const sub = subscription.subscribe({
-        next: ({ value: { data } }) => {
+        next: (msg: OnCreatePostSubscriptionMsg) => {
+          const {
+            value: { data },
+          } = msg;
           const post = data.onCreatePost;
-          if (post.owner !== userId) return;
+          if (post?.owner !== userId) return;
           dispatch({ type: ActionType.SUBSCRIPTION, post });
         },
       });

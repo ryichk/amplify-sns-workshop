@@ -1,4 +1,13 @@
-export type Diff = 'years' | 'months' | 'weeks' | 'days' | 'hours' | 'minutes' | 'seconds';
+import { OnCreatePostSubscription, OnCreateTimelineSubscription } from '../API';
+
+export type DateTimeExpression =
+  | 'years'
+  | 'months'
+  | 'weeks'
+  | 'days'
+  | 'hours'
+  | 'minutes'
+  | 'seconds';
 
 export type Post =
   | {
@@ -57,4 +66,12 @@ export interface ReducerAction {
   type: ActionType;
   post?: Post | undefined;
   posts?: Posts;
+}
+
+export interface OnCreatePostSubscriptionMsg {
+  value: { data: OnCreatePostSubscription };
+}
+
+export interface OnCreateTimelineSubscriptionMsg {
+  value: { data: OnCreateTimelineSubscription };
 }
