@@ -6,6 +6,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "aws-appsync": "3.0.2",
+    "axios": "^0.22.0",
+    "graphql": "^15.6.1",
     "graphql-tag": "2.10.3",
     "node-fetch": "2.6.0"
   }

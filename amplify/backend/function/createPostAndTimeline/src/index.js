@@ -5,6 +5,7 @@
 	REGION
 Amplify Params - DO NOT EDIT */
 
+const aws = require('aws-sdk');
 const AWSAppSyncClient = require('aws-appsync').default;
 const gql = require('graphql-tag');
 global.fetch = require('node-fetch');
@@ -12,6 +13,7 @@ global.fetch = require('node-fetch');
 let graphqlClient;
 
 exports.handler = async (event, context, callback) => {
+    console.log(event);
     let env;
     let graphql_auth;
 
@@ -19,7 +21,7 @@ exports.handler = async (event, context, callback) => {
         callback('content length is over 140', null);
     }
 
-    if ('AWS_EXECUTION_ENV' in process.env && process.env.AWS_EXECUTION_EN.startsWith('AWS_Lambda_')) {
+    if ('AWS_EXECUTION_ENV' in process.env && process.env.AWS_EXECUTION_ENV.startsWith('AWS_Lambda_')) {
         // for cloud env
         env = process.env;
         graphql_auth = {
@@ -35,15 +37,11 @@ exports.handler = async (event, context, callback) => {
         env = {
             API_BOYAKIGQL_GRAPHQLAPIENDPOINTOUTPUT: 'http://localhost:20002/graphql',
             REGION: 'us-east-1',
-            graphql_auth = {
-                type: 'AWS_IAM',
-                credentials: {
-                    accessKeyId: 'mock',
-                    secretAccessKey: 'mock',
-                    sessionToken: 'mock',
-                }
-            };
         }
+        graphql_auth = {
+            type: 'AWS_IAM',
+            credentials: () => aws.config.credentials
+        };
     }
 
     if (!graphqlClient) {
@@ -57,7 +55,7 @@ exports.handler = async (event, context, callback) => {
 
     // post to the origin
     const postInput = {
-        mutatoin: gql(createPost),
+        mutation: gql(createPost),
         variables: {
             input: {
                 type: 'post',
@@ -68,22 +66,29 @@ exports.handler = async (event, context, callback) => {
         },
     };
 
-    const response = await graphqlClient.mutate(postInput);
-    const post = response.data.createPost;
+    let post;
+    try {
+        const response = await graphqlClient.mutate(postInput);
+        post = response.data.createPost;
+        const queryInput = {
+            followeeId: event.identity.username,
+            limit: 100000,
+        }
+        const listFollowRelationshipsResult = await graphqlClient.query({
+            query: gql(listFollowRelationships),
+            fetchPolicy: 'network-only',
+            variables: queryInput,
+        });
+        const followers = listFollowRelationshipsResult.data.listFollowRelationships.items;
 
-    const queryInput = {
-        followeeId: event.identity.uasername,
-        limit: 100000,
+        // post to timeline
+        followers.push({
+            followerId: post.owner,
+        });
+        await Promise.all(followers.map((follower) => createTimelineForAUser({ follower, post })));
+    } catch(error) {
+        console.log(error);
     }
-    const listFollowRelationshipsResult = await graphqlClient.query({
-        query: gql(listFollowRelationships),
-        fetchPolicy: 'network-only',
-        variables: queryInput,
-    });
-
-    followers.push({
-        followerId: post.owner,
-    });
 
     return post;
 };
@@ -99,10 +104,14 @@ const createTimelineForAUser = async ({ follower, post }) => {
             },
         },
     }
-    await graphqlClient.mutate(timelineInput);
+    try {
+        await graphqlClient.mutate(timelineInput);
+    } catch(error) {
+        console.log(error);
+    }
 }
 
-const listFollowRelationships = /* GraphQL */ `
+const listFollowRelationships = /* GraphQL */`
   query ListFollowRelationships(
       $followeeId: ID
       $followerId: ModelIDKeyConditionInput
@@ -129,7 +138,7 @@ const listFollowRelationships = /* GraphQL */ `
   }
 `;
 
-const createPost = /* GraphQL */ `
+const createPost = /* GraphQL */`
   mutation CreatePost(
       $input: CreatePostInput!
       $condition: ModelPostConditionInput
@@ -144,7 +153,7 @@ const createPost = /* GraphQL */ `
   }
 `;
 
-const createTimeline = /* GraphQL */ `
+const createTimeline = /* GraphQL */`
   mutation CreateTimeline(
       $input: CreateTimelineInput!
       $condition: ModelTimelineConditionInput

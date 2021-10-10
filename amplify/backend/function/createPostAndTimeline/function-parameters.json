@@ -3,9 +3,28 @@
     "api": {
       "BoyakiGql": [
         "Query",
-        "Mutation"
+        "Mutation",
+        "Subscription"
       ]
     }
   },
-  "lambdaLayers": []
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "environment",
+      "environmentVariableName": "environment"
+    },
+    {
+      "cloudFormationParameterName": "region",
+      "environmentVariableName": "region"
+    },
+    {
+      "cloudFormationParameterName": "apiGraphqlapiGraphQlapiIdOutput",
+      "environmentVariableName": "apiGraphqlapiGraphQLAPIIdOutput"
+    },
+    {
+      "cloudFormationParameterName": "apiGraphapiQlapiEndpointOutput",
+      "environmentVariableName": "apiGraphapiQLAPIEndpointOutput"
+    }
+  ]
 }

@@ -58,7 +58,7 @@ type FollowRelationship
   @auth(rules: [
     {
       allow: owner,
-      ownerField: "follwerId",
+      ownerField: "followerId",
       provider: userPools,
       operations: [read, create, delete]
     },
@@ -70,7 +70,7 @@ type FollowRelationship
     {
       allow: private,
       provider: iam,
-      operations: [read]
+      operations: [create]
     }
   ])
   @key(
