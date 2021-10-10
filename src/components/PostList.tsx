@@ -16,7 +16,7 @@ import {
 import { useHistory } from 'react-router';
 import moment from 'moment';
 
-import { Diff, Post, PostItemProps, PostListProps } from '../interfaces';
+import { DateTimeExpression, Post, PostItemProps, PostListProps } from '../interfaces';
 
 const useStyles = makeStyles(() => ({
   listRoot: {
@@ -53,10 +53,18 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
   const now = moment();
 
   const calcTimestampDiff = (timestamp: number) => {
-    const scales: Array<Diff> = ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'];
+    const scales: Array<DateTimeExpression> = [
+      'years',
+      'months',
+      'weeks',
+      'days',
+      'hours',
+      'minutes',
+      'seconds',
+    ];
 
     for (let i = 0; i < scales.length; i += 1) {
-      const scale: Diff = scales[i];
+      const scale: DateTimeExpression = scales[i];
       const diff = moment(now).diff(timestamp * 1000, scale);
       if (diff > 0) return diff + scale.charAt(0);
     }
@@ -65,7 +73,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
   };
 
   return (
-    <ListItem alignItems="flex-start" key={post?.id}>
+    <ListItem alignItems="flex-start">
       <ListItemAvatar>
         <button
           type="button"
@@ -97,6 +105,7 @@ const PostList: React.FC<PostListProps> = ({
   posts,
   getAdditionalPosts,
   listHeaderTitle,
+  listHeaderTitleButton,
 }) => {
   const classes = useStyles();
   return (
@@ -109,10 +118,11 @@ const PostList: React.FC<PostListProps> = ({
         <List disablePadding>
           <ListItem alignItems="flex-start" className={classes.listHeader}>
             <Typography variant="h5">{listHeaderTitle}</Typography>
+            {listHeaderTitleButton}
           </ListItem>
           {posts?.map((post: Post) => {
             return (
-              <span>
+              <span key={post?.id}>
                 <PostItem post={post} />
                 <Divider component="li" />
               </span>

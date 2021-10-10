@@ -15,7 +15,7 @@ import { Person as PersonIcon, Public as PublicIcon } from '@mui/icons-material'
 import { Auth, API, graphqlOperation } from 'aws-amplify';
 
 import { useHistory } from 'react-router';
-import { createPost } from '../graphql/mutations';
+import { createPostAndTimeline } from '../graphql/mutations';
 
 const drawerWidth = 340;
 const MAX_POST_CONTENT_LENGTH = 140;
@@ -64,12 +64,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeListItem }) => {
 
   const onPost = async () => {
     await API.graphql(
-      graphqlOperation(createPost, {
-        input: {
-          type: 'post',
-          content: value,
-          timestamp: Math.floor(Date.now() / 1000),
-        },
+      graphqlOperation(createPostAndTimeline, {
+        content: value,
       })
     );
 

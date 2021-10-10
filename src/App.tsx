@@ -12,6 +12,7 @@ import awsconfig from './aws-exports.js';
 
 import AllPosts from './containers/AllPosts';
 import PostsBySpecifiedUser from './containers/PostsBySpecifiedUser';
+import Timeline from './containers/Timeline';
 
 declare module '@mui/styles/defaultTheme' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -82,7 +83,7 @@ function Component() {
       <CssBaseline />
       <HashRouter>
         <Switch>
-          <Route exact path="/" component={AllPosts} />
+          <Route exact path="/" component={Timeline} />
           <Route exact path="/global-timeline" component={AllPosts} />
           <Route exact path="/:userId" component={PostsBySpecifiedUser} />
           <Redirect path="*" to="/" />
@@ -101,7 +102,7 @@ const App: React.FC = () => {
       setAuthState(nextAuthState);
       setUser(authData as CognitoUserInterface);
     });
-  }, []);
+  }, [user]);
 
   return authState === AuthState.SignedIn && user ? (
     <StyledEngineProvider injectFirst>
