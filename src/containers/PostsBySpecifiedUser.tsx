@@ -66,11 +66,12 @@ const PostsBySpecifiedUser: React.FC = () => {
       followerId: currentUser?.username,
       timestamp: Math.floor(Date.now() / 1000),
     };
-    await API.graphql(
+    const response = await API.graphql(
       graphqlOperation(createFollowRelationship, {
         input,
       })
     );
+    if (!response.data.createFollowRelationship?.errors) setIsFollowing(true);
   };
 
   const unfollow = async () => {
@@ -80,7 +81,7 @@ const PostsBySpecifiedUser: React.FC = () => {
     };
     const response = await API.graphql(graphqlOperation(deleteFollowRelationship, { input }));
 
-    if (!response.data.deleteFollowRelationship.errors) setIsFollowing(false);
+    if (!response.data.deleteFollowRelationship?.errors) setIsFollowing(false);
   };
 
   useEffect(() => {
