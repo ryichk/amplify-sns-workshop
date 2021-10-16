@@ -27,32 +27,41 @@ const PostsBySpecifiedUser: React.FC = () => {
   const [isFollowing, setIsFollowing] = useState(false);
 
   const getPosts = async (type: ActionType, _nextToken: string | null | undefined = null) => {
-    const response = await API.graphql(
-      graphqlOperation(listPostsBySpecificOwner, {
-        owner: userId,
-        sortDirection: 'DESC',
-        limit: 20,
-        nextToken: _nextToken,
-      })
-    );
-    if ('data' in response && response.data) {
-      const listPosts = response.data as ListPostsBySpecificOwnerQuery;
-      if (listPosts.listPostsBySpecificOwner) {
-        dispatch({ type, posts: listPosts.listPostsBySpecificOwner.items });
-        setNextToken(listPosts.listPostsBySpecificOwner.nextToken);
-        setIsLoading(false);
+    try {
+      const response = await API.graphql(
+        graphqlOperation(listPostsBySpecificOwner, {
+          owner: userId,
+          sortDirection: 'DESC',
+          limit: 20,
+          nextToken: _nextToken,
+        })
+      );
+      if ('data' in response && response.data) {
+        const listPosts = response.data as ListPostsBySpecificOwnerQuery;
+        if (listPosts.listPostsBySpecificOwner) {
+          dispatch({ type, posts: listPosts.listPostsBySpecificOwner.items });
+          setNextToken(listPosts.listPostsBySpecificOwner.nextToken);
+          setIsLoading(false);
+        }
       }
+    } catch (error) {
+      console.log(error);
     }
   };
 
-  const getIsFollowing = async (followerId: string, followeeId: string) => {
-    const response = await API.graphql(
-      graphqlOperation(getFollowRelationship, {
-        followeeId,
-        followerId,
-      })
-    );
-    return response.data.getFollowRelationship !== null;
+  const getIsFollowing = async (followeeId: string, followerId: string) => {
+    try {
+      const response = await API.graphql(
+        graphqlOperation(getFollowRelationship, {
+          followeeId,
+          followerId,
+        })
+      );
+      return response.data.getFollowRelationship !== null;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   };
 
   const getAdditionalPosts = () => {
@@ -61,37 +70,46 @@ const PostsBySpecifiedUser: React.FC = () => {
   };
 
   const follow = async () => {
-    const input = {
-      followeeId: userId,
-      followerId: currentUser?.username,
-      timestamp: Math.floor(Date.now() / 1000),
-    };
-    const response = await API.graphql(
-      graphqlOperation(createFollowRelationship, {
-        input,
-      })
-    );
-    if (!response.data.createFollowRelationship?.errors) setIsFollowing(true);
+    try {
+      const input = {
+        followeeId: userId,
+        followerId: currentUser?.username,
+        timestamp: Math.floor(Date.now() / 1000),
+      };
+      const response = await API.graphql(
+        graphqlOperation(createFollowRelationship, {
+          input,
+        })
+      );
+      if (!response.data.createFollowRelationship?.errors) setIsFollowing(true);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const unfollow = async () => {
-    const input = {
-      followeeId: userId,
-      followerId: currentUser?.username,
-    };
-    const response = await API.graphql(graphqlOperation(deleteFollowRelationship, { input }));
-
-    if (!response.data.deleteFollowRelationship?.errors) setIsFollowing(false);
+    try {
+      const input = {
+        followeeId: userId,
+        followerId: currentUser?.username,
+      };
+      const response = await API.graphql(graphqlOperation(deleteFollowRelationship, { input }));
+      if (!response.data.deleteFollowRelationship?.errors) setIsFollowing(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
     const init = async () => {
-      const currentAuthUser = await Auth.currentAuthenticatedUser();
-      setCurrentUser(currentAuthUser);
-
-      setIsFollowing(await getIsFollowing(userId, currentAuthUser.username));
-
-      getPosts(ActionType.INITIAL_QUERY);
+      try {
+        const currentAuthUser = await Auth.currentAuthenticatedUser();
+        setCurrentUser(currentAuthUser);
+        setIsFollowing(await getIsFollowing(userId, currentAuthUser.username));
+        getPosts(ActionType.INITIAL_QUERY);
+      } catch (error) {
+        console.log(error);
+      }
     };
     init();
 
