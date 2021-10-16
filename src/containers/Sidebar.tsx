@@ -10,7 +10,7 @@ import {
   ListItemIcon,
   Drawer,
 } from '@mui/material';
-import { Person as PersonIcon, Public as PublicIcon } from '@mui/icons-material';
+import { Person as PersonIcon, Public as PublicIcon, Home as HomeIcon } from '@mui/icons-material';
 
 import { Auth, API, graphqlOperation } from 'aws-amplify';
 
@@ -63,17 +63,25 @@ const Sidebar: React.FC<SidebarProps> = ({ activeListItem }) => {
   };
 
   const onPost = async () => {
-    await API.graphql(
-      graphqlOperation(createPostAndTimeline, {
-        content: value,
-      })
-    );
+    try {
+      await API.graphql(
+        graphqlOperation(createPostAndTimeline, {
+          content: value,
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
 
     setValue('');
   };
 
   const signOut = () => {
-    Auth.signOut();
+    try {
+      Auth.signOut();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -87,6 +95,19 @@ const Sidebar: React.FC<SidebarProps> = ({ activeListItem }) => {
     >
       <div className={classes.toolbar} />
       <List>
+        <ListItem
+          button
+          selected={activeListItem === 'Home'}
+          onClick={() => {
+            history.push('/');
+          }}
+          key="home"
+        >
+          <ListItemIcon>
+            <HomeIcon />
+          </ListItemIcon>
+          <ListItemText primary="Home" />
+        </ListItem>
         <ListItem
           button
           selected={activeListItem === 'global-timeline'}
