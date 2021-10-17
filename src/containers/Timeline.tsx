@@ -55,10 +55,13 @@ const Timeline: React.FC = () => {
 
   useEffect(() => {
     const init = async () => {
-      const currentAuthUser = await Auth.currentAuthenticatedUser();
-      setCurrentUser(currentAuthUser);
-
-      getPosts(ActionType.INITIAL_QUERY, currentAuthUser);
+      try {
+        const currentAuthUser = await Auth.currentAuthenticatedUser();
+        setCurrentUser(currentAuthUser);
+        getPosts(ActionType.INITIAL_QUERY, currentAuthUser);
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     init();
