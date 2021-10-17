@@ -14,10 +14,7 @@ export const createPostAndTimeline = /* GraphQL */ `
   }
 `;
 export const deletePost = /* GraphQL */ `
-  mutation DeletePost(
-    $input: DeletePostInput!
-    $condition: ModelPostConditionInput
-  ) {
+  mutation DeletePost($input: DeletePostInput!, $condition: ModelPostConditionInput) {
     deletePost(input: $input, condition: $condition) {
       type
       id
@@ -52,10 +49,7 @@ export const deleteFollowRelationship = /* GraphQL */ `
   }
 `;
 export const createPost = /* GraphQL */ `
-  mutation CreatePost(
-    $input: CreatePostInput!
-    $condition: ModelPostConditionInput
-  ) {
+  mutation CreatePost($input: CreatePostInput!, $condition: ModelPostConditionInput) {
     createPost(input: $input, condition: $condition) {
       type
       id
@@ -66,10 +60,7 @@ export const createPost = /* GraphQL */ `
   }
 `;
 export const createTimeline = /* GraphQL */ `
-  mutation CreateTimeline(
-    $input: CreateTimelineInput!
-    $condition: ModelTimelineConditionInput
-  ) {
+  mutation CreateTimeline($input: CreateTimelineInput!, $condition: ModelTimelineConditionInput) {
     createTimeline(input: $input, condition: $condition) {
       userId
       timestamp
