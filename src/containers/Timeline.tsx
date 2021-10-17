@@ -23,24 +23,28 @@ const Timeline: React.FC = () => {
     _currentUser: CognitoUserInterface | null,
     _nextToken: string | null | undefined = null
   ) => {
-    const response = await API.graphql(
-      graphqlOperation(listTimelines, {
-        userId: _currentUser?.username,
-        sortDirection: 'DESC',
-        limit: 20,
-        nextToken: _nextToken,
-      })
-    );
-    if ('data' in response && response.data) {
-      const listTimelinesData = response.data.listTimelines as ListTimelines;
-      if (listTimelinesData.items) {
-        dispatch({
-          type,
-          posts: listTimelinesData.items.filter((item) => item && 'post' in item) as Array<Post>,
-        });
-        setNextToken(listTimelinesData.nextToken);
-        setIsLoading(false);
+    try {
+      const response = await API.graphql(
+        graphqlOperation(listTimelines, {
+          userId: _currentUser?.username,
+          sortDirection: 'DESC',
+          limit: 20,
+          nextToken: _nextToken,
+        })
+      );
+      if ('data' in response && response.data) {
+        const listTimelinesData = response.data.listTimelines as ListTimelines;
+        if (listTimelinesData.items) {
+          dispatch({
+            type,
+            posts: listTimelinesData.items.map((item) => item?.post) as Array<Post>,
+          });
+          setNextToken(listTimelinesData.nextToken);
+          setIsLoading(false);
+        }
       }
+    } catch (error) {
+      console.log(error);
     }
   };
 

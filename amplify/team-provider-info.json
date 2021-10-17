@@ -24,7 +24,7 @@
       "function": {
         "createPostAndTimeline": {
           "deploymentBucketName": "amplify-boyaki-production-92155-deployment",
-          "s3Key": "amplify-builds/createPostAndTimeline-6a627366596c4f6a7344-build.zip",
+          "s3Key": "amplify-builds/createPostAndTimeline-356d7979374e4a553876-build.zip",
           "environment": "process.env.ENV",
           "region": "process.env.REGION",
           "apiGraphqlapiGraphQlapiIdOutput": "process.env.API_BOYAKIGQL_GRAPHQLAPIIDOUTPUT",

@@ -13,7 +13,6 @@ global.fetch = require('node-fetch');
 let graphqlClient;
 
 exports.handler = async (event, context, callback) => {
-    console.log(event);
     let env;
     let graphql_auth;
 
@@ -53,23 +52,21 @@ exports.handler = async (event, context, callback) => {
         });
     }
 
-    // post to the origin
-    const postInput = {
-        mutation: gql(createPost),
-        variables: {
-            input: {
-                type: 'post',
-                timestamp: Math.floor(Date.now() / 1000),
-                owner: event.identity.username,
-                content: event.arguments.content,
-            },
-        },
-    };
-
-    let post;
     try {
+        // post to the origin
+        const postInput = {
+            mutation: gql(createPost),
+            variables: {
+                input: {
+                    type: 'post',
+                    timestamp: Math.floor(Date.now() / 1000),
+                    owner: event.identity.username,
+                    content: event.arguments.content,
+                },
+            },
+        };
         const response = await graphqlClient.mutate(postInput);
-        post = response.data.createPost;
+        const post = response.data.createPost;
         const queryInput = {
             followeeId: event.identity.username,
             limit: 100000,
@@ -85,29 +82,30 @@ exports.handler = async (event, context, callback) => {
         followers.push({
             followerId: post.owner,
         });
-        await Promise.all(followers.map((follower) => createTimelineForAUser({ follower, post })));
+
+        const results = await Promise.all(followers.map((follower) => createTimelineForAUser({ follower, post })));
+        return post;
     } catch(error) {
         console.log(error);
     }
-
-    return post;
 };
 
 const createTimelineForAUser = async ({ follower, post }) => {
-    const timelineInput = {
-        mutation: gql(createTimeline),
-        variables: {
-            input: {
-                userId: follower.followerId,
-                timestamp: post.timestamp,
-                postId: post.id
-            },
-        },
-    }
     try {
+        const timelineInput = {
+            mutation: gql(createTimeline),
+            variables: {
+                input: {
+                    userId: follower.followerId,
+                    timestamp: post.timestamp,
+                    postId: post.id
+                },
+            },
+        }
         await graphqlClient.mutate(timelineInput);
     } catch(error) {
         console.log(error);
+        return error;
     }
 }
 

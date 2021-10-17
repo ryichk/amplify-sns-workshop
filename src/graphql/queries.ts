@@ -27,41 +27,6 @@ export const listPosts = /* GraphQL */ `
     }
   }
 `;
-export const getFollowRelationship = /* GraphQL */ `
-  query GetFollowRelationship($followeeId: ID!, $followerId: ID!) {
-    getFollowRelationship(followeeId: $followeeId, followerId: $followerId) {
-      followeeId
-      followerId
-      timestamp
-    }
-  }
-`;
-export const listFollowRelationships = /* GraphQL */ `
-  query ListFollowRelationships(
-    $followeeId: ID
-    $followerId: ModelIDKeyConditionInput
-    $filter: ModelFollowRelationshipFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listFollowRelationships(
-      followeeId: $followeeId
-      followerId: $followerId
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        followeeId
-        followerId
-        timestamp
-      }
-      nextToken
-    }
-  }
-`;
 export const getTimeline = /* GraphQL */ `
   query GetTimeline($userId: ID!, $timestamp: Int!) {
     getTimeline(userId: $userId, timestamp: $timestamp) {
@@ -161,6 +126,41 @@ export const listPostsBySpecificOwner = /* GraphQL */ `
         id
         content
         owner
+        timestamp
+      }
+      nextToken
+    }
+  }
+`;
+export const getFollowRelationship = /* GraphQL */ `
+  query GetFollowRelationship($followeeId: ID!, $followerId: ID!) {
+    getFollowRelationship(followeeId: $followeeId, followerId: $followerId) {
+      followeeId
+      followerId
+      timestamp
+    }
+  }
+`;
+export const listFollowRelationships = /* GraphQL */ `
+  query ListFollowRelationships(
+    $followeeId: ID
+    $followerId: ModelIDKeyConditionInput
+    $filter: ModelFollowRelationshipFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listFollowRelationships(
+      followeeId: $followeeId
+      followerId: $followerId
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        followeeId
+        followerId
         timestamp
       }
       nextToken
