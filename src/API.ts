@@ -191,6 +191,86 @@ export type ModelTimelineConnection = {
   nextToken?: string | null;
 };
 
+export type SearchablePostFilterInput = {
+  type?: SearchableStringFilterInput | null;
+  id?: SearchableIDFilterInput | null;
+  content?: SearchableStringFilterInput | null;
+  owner?: SearchableStringFilterInput | null;
+  timestamp?: SearchableIntFilterInput | null;
+  and?: Array<SearchablePostFilterInput | null> | null;
+  or?: Array<SearchablePostFilterInput | null> | null;
+  not?: SearchablePostFilterInput | null;
+};
+
+export type SearchableStringFilterInput = {
+  ne?: string | null;
+  gt?: string | null;
+  lt?: string | null;
+  gte?: string | null;
+  lte?: string | null;
+  eq?: string | null;
+  match?: string | null;
+  matchPhrase?: string | null;
+  matchPhrasePrefix?: string | null;
+  multiMatch?: string | null;
+  exists?: boolean | null;
+  wildcard?: string | null;
+  regexp?: string | null;
+  range?: Array<string | null> | null;
+};
+
+export type SearchableIDFilterInput = {
+  ne?: string | null;
+  gt?: string | null;
+  lt?: string | null;
+  gte?: string | null;
+  lte?: string | null;
+  eq?: string | null;
+  match?: string | null;
+  matchPhrase?: string | null;
+  matchPhrasePrefix?: string | null;
+  multiMatch?: string | null;
+  exists?: boolean | null;
+  wildcard?: string | null;
+  regexp?: string | null;
+  range?: Array<string | null> | null;
+};
+
+export type SearchableIntFilterInput = {
+  ne?: number | null;
+  gt?: number | null;
+  lt?: number | null;
+  gte?: number | null;
+  lte?: number | null;
+  eq?: number | null;
+  range?: Array<number | null> | null;
+};
+
+export type SearchablePostSortInput = {
+  field?: SearchablePostSortableFields | null;
+  direction?: SearchableSortDirection | null;
+};
+
+export enum SearchablePostSortableFields {
+  type = 'type',
+  id = 'id',
+  content = 'content',
+  owner = 'owner',
+  timestamp = 'timestamp',
+}
+
+export enum SearchableSortDirection {
+  asc = 'asc',
+  desc = 'desc',
+}
+
+export type SearchablePostConnection = {
+  __typename: 'SearchablePostConnection';
+  items?: Array<Post | null> | null;
+  nextToken?: string | null;
+  total?: number | null;
+};
+
 export type ModelIDKeyConditionInput = {
   eq?: string | null;
   le?: string | null;
@@ -446,6 +526,30 @@ export type ListPostsBySpecificOwnerQuery = {
       timestamp: number;
     } | null> | null;
     nextToken?: string | null;
+  } | null;
+};
+
+export type SearchPostsQueryVariables = {
+  filter?: SearchablePostFilterInput | null;
+  sort?: SearchablePostSortInput | null;
+  limit?: number | null;
+  nextToken?: string | null;
+  from?: number | null;
+};
+
+export type SearchPostsQuery = {
+  searchPosts?: {
+    __typename: 'SearchablePostConnection';
+    items?: Array<{
+      __typename: 'Post';
+      type: string;
+      id?: string | null;
+      content: string;
+      owner?: string | null;
+      timestamp: number;
+    } | null> | null;
+    nextToken?: string | null;
+    total?: number | null;
   } | null;
 };
 

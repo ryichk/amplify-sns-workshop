@@ -10,7 +10,12 @@ import {
   ListItemIcon,
   Drawer,
 } from '@mui/material';
-import { Person as PersonIcon, Public as PublicIcon, Home as HomeIcon } from '@mui/icons-material';
+import {
+  Person as PersonIcon,
+  Public as PublicIcon,
+  Home as HomeIcon,
+  Search as SearchIcon,
+} from '@mui/icons-material';
 
 import { Auth, API, graphqlOperation } from 'aws-amplify';
 
@@ -107,6 +112,21 @@ const Sidebar: React.FC<SidebarProps> = ({ activeListItem }) => {
             <HomeIcon />
           </ListItemIcon>
           <ListItemText primary="Home" />
+        </ListItem>
+        <ListItem
+          button
+          selected={activeListItem === 'search'}
+          onClick={() => {
+            Auth.currentAuthenticatedUser().then(() => {
+              history.push('/search');
+            });
+          }}
+          key="search"
+        >
+          <ListItemIcon>
+            <SearchIcon />
+          </ListItemIcon>
+          <ListItemText primary="Search" />
         </ListItem>
         <ListItem
           button

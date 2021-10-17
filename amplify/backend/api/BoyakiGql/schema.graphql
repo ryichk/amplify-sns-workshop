@@ -38,6 +38,7 @@ type Post
     fields: ["owner", "timestamp"],
     queryField: "listPostsBySpecificOwner"
   )
+  @searchable
 {
   type: String!
   id: ID
