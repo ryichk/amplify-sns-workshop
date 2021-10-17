@@ -17,24 +17,28 @@ const AllPosts: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const getPosts = async (type: ActionType, _nextToken: string | null | undefined = null) => {
-    const response = await API.graphql(
-      graphqlOperation(listPostsSortedByTimestamp, {
-        type: 'post',
-        sortDirection: 'DESC',
-        limit: 20,
-        nextToken: _nextToken,
-      })
-    );
-    if ('data' in response && response.data) {
-      const listPosts = response.data as ListPostsSortedByTimestampQuery;
-      if (listPosts.listPostsSortedByTimestamp) {
-        dispatch({
-          type,
-          posts: listPosts.listPostsSortedByTimestamp.items,
-        });
-        setNextToken(listPosts.listPostsSortedByTimestamp.nextToken);
-        setIsLoading(false);
+    try {
+      const response = await API.graphql(
+        graphqlOperation(listPostsSortedByTimestamp, {
+          type: 'post',
+          sortDirection: 'DESC',
+          limit: 20,
+          nextToken: _nextToken,
+        })
+      );
+      if ('data' in response && response.data) {
+        const listPosts = response.data as ListPostsSortedByTimestampQuery;
+        if (listPosts.listPostsSortedByTimestamp) {
+          dispatch({
+            type,
+            posts: listPosts.listPostsSortedByTimestamp.items,
+          });
+          setNextToken(listPosts.listPostsSortedByTimestamp.nextToken);
+          setIsLoading(false);
+        }
       }
+    } catch (error) {
+      console.log(error);
     }
   };
 
