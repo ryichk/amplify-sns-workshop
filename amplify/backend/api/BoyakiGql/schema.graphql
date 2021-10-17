@@ -70,7 +70,7 @@ type FollowRelationship
     {
       allow: private,
       provider: iam,
-      operations: [create]
+      operations: [read]
     }
   ])
   @key(
